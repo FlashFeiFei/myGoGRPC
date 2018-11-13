@@ -1,0 +1,69 @@
+
+// 指定使用proto3，如果不指定的话，编译器会使用proto2去编译
+syntax = "proto3";
+
+option java_multiple_files = true;
+//指定生成类的包名，java中有用
+option java_package = "io.grpc.examples.routeguidedtdy";
+option java_outer_classname = "RouteGuideProtoDtdy";
+
+package routeguidestdy;
+
+service RouteGuideStdy {
+    //一个简单rpc，客户端使用存根发送请求服务器并等待响应返回，就像平常的函数调用一样
+    rpc GetFeature(Point) returns(Feature) {}
+
+    //一个服务器端流式rpc,客户端发送请求到服务器，拿到一个流去读取返回的消息序列。
+    //客户端读取返回的流，直到里面没有任何信息。从例子中可以看出，通过在响应类型
+    //插入stream关键字，可以指定一个服务器端的流方法
+    rpc ListFeatures(Rectangle) returns(stream Feature) {}
+
+    //一个客户端流式rpc，客户端写入一个消息序列，并将其发送到服务器，同样也是
+    //使用流。一旦客户端完成写入消息，它等待服务器完成读取返回它的响应。
+    //通过在请求类型前指定stream关键字来指定一个客户端的流方法
+    rpc RecordRoute(stream Point) returns (RouteSummary) {}
+
+    //一个双向流式rpc是双方使用读写流去发送一个消息序列。两个流独立操作.
+    //因此客户端和服务器可以以任意喜欢的顺序读写：比如，服务器可以在写入响应前
+    //等待接受所有的客户端消息，或者可以交替读取和写入信息，或者其他读写的组合。
+    //每个流中的消息顺序被预留。你可以通过在请求和响应前加上stream关键字去指定方法的类型
+    rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+
+}
+
+
+message Point {
+    int32 latitude = 1;
+    int32 longitude = 2;
+}
+
+message Rectangle{
+    Point lo = 1;
+    Point hi = 2;
+}
+
+message Feature {
+
+    string name = 1;
+
+    Point location = 2;
+}
+
+message RouteNote {
+    Point location = 1;
+
+    string message = 2;
+}
+
+message RouteSummary {
+
+    int32 point_count = 1;
+
+
+    int32 feature_count = 2;
+
+
+    int32 distance = 3;
+
+    int32 elapsed_time = 4;
+}
